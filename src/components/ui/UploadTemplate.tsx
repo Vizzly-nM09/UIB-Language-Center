@@ -9,6 +9,7 @@ import {
   Download,
   CheckCircle,
 } from "lucide-react";
+import axios from "axios";
 
 interface Props {
   title: string;
@@ -21,6 +22,7 @@ interface Props {
 export default function UploadPageTemplate({
   title,
   description,
+  apiEndpoint,
   templateName,
   templateUrl,
 }: Props) {
@@ -45,34 +47,53 @@ export default function UploadPageTemplate({
       toast.error("Pilih file terlebih dahulu!");
       return;
     }
+
+    const formData = new FormData();
+    formData.append("file", file); // Key "file" ini harus sama dengan yang diekspektasi Backend
+
     setIsUploading(true);
-    const interval = setInterval(
-      () => setProgress((p) => (p >= 95 ? 95 : p + 5)),
-      100,
-    );
+    setProgress(0);
 
     try {
-      // Simulasi upload
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      clearInterval(interval);
-      setProgress(100);
-      toast.success(`Data ${title} berhasil diupload!`);
+      // PROSES UPLOAD REAL MENGGUNAKAN AXIOS
+      const response = await axios.post(apiEndpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        // Tracking progress upload asli
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 100),
+          );
+          setProgress(percentCompleted);
+        },
+      });
 
-      // Reset setelah sukses
-      setTimeout(() => {
-        setFile(null);
-        setIsUploading(false);
-        setProgress(0);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }, 1000);
-    } catch (error) {
-      clearInterval(interval);
+      if (response.status === 200 || response.status === 201) {
+        toast.success(`Data ${title} berhasil diupload!`);
+
+        // Reset state setelah jeda sebentar agar user bisa lihat progress 100%
+        setTimeout(() => {
+          setFile(null);
+          setIsUploading(false);
+          setProgress(0);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }, 1500);
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
       setIsUploading(false);
-      toast.error("Gagal mengupload data.");
+      setProgress(0);
+
+      // Ambil pesan error dari backend jika ada
+      const errorMessage =
+        error.response?.data?.message || "Gagal mengupload data.";
+      toast.error(errorMessage);
     }
   };
 
   const handleCancel = () => {
+    if (isUploading) return; // Mencegah cancel saat sedang proses kirim
     setFile(null);
     setProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -83,7 +104,7 @@ export default function UploadPageTemplate({
     <div className="flex-1 overflow-y-auto p-8 scroll-smooth h-full text-gray-800">
       <Toaster position="top-right" />
 
-      {/* 1. JUDUL & DESKRIPSI (DIJAMIN ADA) */}
+      {/* 1. JUDUL & DESKRIPSI */}
       <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-700">
         <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
           {title}
@@ -92,7 +113,7 @@ export default function UploadPageTemplate({
       </div>
 
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* 2. SECTION DOWNLOAD TEMPLATE (HANYA MUNCUL JIKA ADA URL) */}
+        {/* 2. SECTION DOWNLOAD TEMPLATE */}
         {templateUrl && (
           <div className="bg-indigo-50/50 p-6 flex flex-col md:flex-row justify-between items-center border-b border-indigo-100 gap-4">
             <div className="flex items-center gap-4">
@@ -188,7 +209,7 @@ export default function UploadPageTemplate({
             </div>
           )}
 
-          {/* 4. TOMBOL AKSI (BATAL & UPLOAD DATA) */}
+          {/* 4. TOMBOL AKSI */}
           <div className="mt-10 flex flex-col-reverse md:flex-row justify-end gap-4 border-t border-gray-100 pt-8">
             <button
               type="button"
@@ -203,8 +224,8 @@ export default function UploadPageTemplate({
               onClick={handleUpload}
               disabled={!file || isUploading}
               className={`px-10 py-3.5 rounded-xl font-bold text-white shadow-lg transition-all flex items-center justify-center gap-2.5 
-                                ${!file || isUploading ? "bg-gray-300 cursor-not-allowed shadow-none text-gray-500" : "bg-[#6C5DD3] hover:bg-[#5b4eb8] active:scale-95 shadow-purple-500/20"}
-                            `}
+                ${!file || isUploading ? "bg-gray-300 cursor-not-allowed shadow-none text-gray-500" : "bg-[#6C5DD3] hover:bg-[#5b4eb8] active:scale-95 shadow-purple-500/20"}
+              `}
             >
               {isUploading ? "Memproses..." : "Upload Data"}
             </button>
