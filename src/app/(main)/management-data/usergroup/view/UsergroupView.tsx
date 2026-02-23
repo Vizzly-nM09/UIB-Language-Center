@@ -22,7 +22,12 @@ export default function UsergroupView() {
   // --- LOGIC PRESERVED ---
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [usergroup, setUsergroup] = useState({ id: 0, name: "" });
+  const [usergroup, setUsergroup] = useState({ 
+    id: 0, 
+    name: "",
+    level: "",
+    description: ""
+  });
 
   const { data, isLoading, refetch } = useUsergroupData(
     session?.user?.accessToken,
@@ -37,7 +42,7 @@ export default function UsergroupView() {
         message: "Grup ditambahkan",
       });
       refetch();
-      setUsergroup({ id: 0, name: "" });
+      setUsergroup({ id: 0, name: "", level: "", description: "" });
     },
     (msg) => {
       showNotification({
@@ -58,7 +63,7 @@ export default function UsergroupView() {
       });
       refetch();
       setIsEditing(false);
-      setUsergroup({ id: 0, name: "" });
+      setUsergroup({ id: 0, name: "", level: "", description: "" });
     },
     (msg) => {
       showNotification({
@@ -93,14 +98,24 @@ export default function UsergroupView() {
     e.preventDefault();
     const payload = {
       token: session?.user?.accessToken,
-      usergroup: { id: usergroup.id, name: usergroup.name },
+      usergroup: { 
+        id: usergroup.id, 
+        name: usergroup.name,
+        level: usergroup.level,
+        description: usergroup.description
+      },
     };
     !isEditing ? createMutation(payload) : updateMutation(payload);
   };
 
   const handleEdit = (data: UsergroupType) => {
     setIsEditing(true);
-    setUsergroup({ id: Number(data.group_id), name: data.group_name });
+    setUsergroup({ 
+      id: Number(data.group_id), 
+      name: data.group_name,
+      level: data.group_level || "",
+      description: data.keterangan_group || ""
+    });
   };
   const handleDelete = (data: UsergroupType) => {
     showConfirmation({
@@ -169,6 +184,40 @@ export default function UsergroupView() {
                 placeholder="e.g. Moderator"
               />
             </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                Status Level
+              </label>
+              <select
+                required
+                value={usergroup.level}
+                onChange={(e) =>
+                  setUsergroup({ ...usergroup, level: e.target.value })
+                }
+                className="w-full rounded-2xl border-2 border-gray-50 px-4 py-3.5 text-sm font-bold focus:border-[#6C5DD3] transition-all"
+              >
+                <option value="">Select status...</option>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                Description
+              </label>
+              <textarea
+                value={usergroup.description}
+                onChange={(e) =>
+                  setUsergroup({ ...usergroup, description: e.target.value })
+                }
+                className="w-full rounded-2xl border-2 border-gray-50 px-4 py-3.5 text-sm font-bold focus:border-[#6C5DD3] transition-all resize-none"
+                placeholder="Add a description..."
+                rows={3}
+              />
+            </div>
+
             <button
               type="submit"
               className="w-full py-4 bg-gradient-to-r from-[#6C5DD3] to-[#8E7EFF] text-white font-black text-[10px] rounded-2xl shadow-lg shadow-purple-100 uppercase tracking-widest hover:scale-[1.02] transition-all"
@@ -180,7 +229,7 @@ export default function UsergroupView() {
                 type="button"
                 onClick={() => {
                   setIsEditing(false);
-                  setUsergroup({ id: 0, name: "" });
+                  setUsergroup({ id: 0, name: "", level: "", description: "" });
                 }}
                 className="w-full py-2 font-black text-[10px] text-gray-400 uppercase tracking-widest hover:text-red-500"
               >

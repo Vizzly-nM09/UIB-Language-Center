@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
+import { DatePicker } from "@/components/DatePicker";
 
 // --- KOMPONEN INPUT MODERN ---
 const FloatingInput = ({
@@ -123,6 +124,7 @@ export default function ScoreTest() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<any>({
@@ -135,6 +137,7 @@ export default function ScoreTest() {
   const nR = watch("nilaiReading");
   const nW = watch("nilaiWriting");
   const nSp = watch("nilaiSpeaking");
+  const tanggalUjian = watch("tanggalUjian");
 
   // ✅ ESTIMASI SKOR TOTAL UNTUK SEMUA TES
   const estimatedTotal = useMemo(() => {
@@ -218,7 +221,7 @@ export default function ScoreTest() {
           nilai_reading: Number(data.nilaiReading || 0),
           nilai_writing: Number(data.nilaiWriting || 0),
           nilai_speaking: Number(data.nilaiSpeaking || 0),
-          skor_total: estimatedTotal, // ✅ SKOR TOTAL DIKIRIM
+          skor_total: estimatedTotal, //\
         }),
       });
 
@@ -244,9 +247,6 @@ export default function ScoreTest() {
         <h1 className="text-4xl font-black tracking-tighter text-gray-900">
           Input Score Test
         </h1>
-        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest opacity-60">
-          Portal Manajemen Sertifikasi
-        </p>
       </div>
 
       <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] p-8 md:p-12">
@@ -254,32 +254,32 @@ export default function ScoreTest() {
           {/* IDENTITAS */}
           <div className="space-y-6">
             <h3 className="text-xs font-black text-[#6C5DD3] uppercase tracking-[0.2em] flex items-center gap-4 before:h-[2px] before:w-8 before:bg-[#6C5DD3] after:h-[2px] after:flex-1 after:bg-gray-100">
-              Identitas
+              Identity
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <FloatingInput
-                label="NPM Mahasiswa"
+                label="NPM (7 digits)"
                 name="npm"
                 register={register}
                 errors={errors}
                 required
               />
               <FloatingInput
-                label="Nama Lengkap"
+                label="Full Name"
                 name="nama"
                 register={register}
                 errors={errors}
                 required
               />
               <CustomSelect
-                label="Prodi"
+                label="Study Program"
                 name="prodi"
                 register={register}
                 required
                 disabled={isLoadingProdi}
               >
                 <option value="">
-                  {isLoadingProdi ? "Memuat..." : "Pilih Program Studi"}
+                  {isLoadingProdi ? "Memuat..." : "Select the Study Program"}
                 </option>
                 {prodiList.map((item: any) => (
                   <option key={item.ProdiId} value={item.ProdiNama}>
@@ -293,11 +293,11 @@ export default function ScoreTest() {
           {/* DETAIL UJIAN */}
           <div className="space-y-6">
             <h3 className="text-xs font-black text-[#6C5DD3] uppercase tracking-[0.2em] flex items-center gap-4 before:h-[2px] before:w-8 before:bg-[#6C5DD3] after:h-[2px] after:flex-1 after:bg-gray-100">
-              Ujian
+              Test
             </h3>
             <div className="p-8 rounded-[2rem] bg-[#F8F9FC] grid grid-cols-1 md:grid-cols-3 gap-8 border border-gray-100/50">
               <CustomSelect
-                label="Jenis"
+                label="Test Type"
                 name="jenisTes"
                 register={register}
                 required
@@ -307,7 +307,7 @@ export default function ScoreTest() {
                 <option value="toefl_ibt">TOEFL iBT</option>
               </CustomSelect>
               <CustomSelect
-                label="Tipe"
+                label="Type"
                 name="tipeTes"
                 register={register}
                 required
@@ -315,14 +315,19 @@ export default function ScoreTest() {
                 <option value="prediction">Prediction</option>
                 <option value="official">Official</option>
               </CustomSelect>
-              <FloatingInput
-                label="Tanggal Ujian"
-                name="tanggalUjian"
-                type="date"
-                register={register}
-                errors={errors}
-                required
-              />
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">
+                  Exam Date
+                </label>
+                <DatePicker
+                  placeholder="Pilih tanggal ujian"
+                  value={tanggalUjian || ""}
+                  setValue={(date) =>
+                    setValue("tanggalUjian", date.split("T")[0])
+                  }
+                  className="text-xs"
+                />
+              </div>
             </div>
           </div>
 
@@ -330,11 +335,11 @@ export default function ScoreTest() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-4 flex-1 after:h-[2px] after:flex-1 after:bg-gray-100">
-                Nilai ({jenisTes?.toUpperCase()})
+                Grade ({jenisTes?.toUpperCase()})
               </h3>
               {estimatedTotal > 0 && (
                 <div className="ml-4 px-6 py-2 bg-purple-600 text-white rounded-2xl text-[10px] font-black shadow-lg shadow-purple-200 animate-in zoom-in duration-300">
-                  ESTIMASI TOTAL: {estimatedTotal}
+                  TOTAL ESTIMATE: {estimatedTotal}
                 </div>
               )}
             </div>
@@ -448,7 +453,7 @@ export default function ScoreTest() {
               disabled={isSubmitting}
               className="px-12 py-4 bg-[#6C5DD3] text-white font-black text-xs rounded-2xl shadow-xl hover:scale-[1.02] transition-all uppercase tracking-widest"
             >
-              {isSubmitting ? "Processing..." : "Submit Data"}
+              {isSubmitting ? "Processing..." : "Submit"}
             </button>
           </div>
         </form>

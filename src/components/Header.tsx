@@ -3,15 +3,17 @@ import { Menu, Search, Bell, HelpCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { UcFirst } from "@/utils/UcFirst";
 import React from "react";
+import { useHelp } from "@/contexts/help-context";
 
 const Header = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   const pathname = usePathname();
+  const { openModal, tourActive } = useHelp();
 
   // Memecah path URL untuk breadcrumb otomatis
   const pathParts = pathname.split("/").filter((p) => p && p !== "dashboard");
 
   return (
-    <header className="sticky top-0 z-40 h-20 flex items-center px-8 justify-between bg-[#F3F4F6]/80 backdrop-blur-md border-b border-gray-200/50 transition-all duration-300">
+    <header className={`sticky top-0 h-20 flex items-center px-8 justify-between bg-[#F3F4F6]/80 backdrop-blur-md border-b border-gray-200/50 transition-all duration-300 ${tourActive ? 'z-20' : 'z-40'}`}>
       <div className="flex items-center gap-6 w-full max-w-4xl">
         {/* Dynamic Breadcrumbs / Page Title */}
         <div className="flex flex-col">
@@ -32,7 +34,11 @@ const Header = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
           <Bell size={20} />
           <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#F3F4F6]" />
         </button>
-        <button className="p-2.5 text-gray-400 hover:text-[#6C5DD3] hover:bg-white rounded-xl transition-all">
+        <button
+          onClick={openModal}
+          className="p-2.5 text-gray-400 hover:text-[#6C5DD3] hover:bg-white rounded-xl transition-all"
+          title="Bantuan & Panduan"
+        >
           <HelpCircle size={20} />
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { UserType } from "@/types/UserTypes";
+import { UserType } from "@/types/UserType";
 import { Pencil, Trash2 } from "lucide-react";
 
 export default function UserInternalCard({
@@ -10,6 +10,10 @@ export default function UserInternalCard({
   handleEdit?: (data: UserType) => void;
   handleDelete?: (data: UserType) => void;
 }) {
+  if (!data.Username && !data.Email) {
+    console.warn("UserInternalCard received empty data:", data);
+  }
+
   return (
     <div
       className="
@@ -39,8 +43,8 @@ export default function UserInternalCard({
 
       {/* Foto Profil */}
       <img
-        src={data.pasphoto_link || "/default-user.png"}
-        alt={data.pegawai_name}
+        src={data.PasphotoLink || "/default-user.png"}
+        alt={data.PegawaiName}
         className="
           w-20 h-20 sm:w-16 sm:h-16
           rounded-full object-cover border border-gray-300 dark:border-gray-600
@@ -57,20 +61,20 @@ export default function UserInternalCard({
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start pr-8 sm:pr-10">
           <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-1 justify-center sm:justify-start">
             <span className="bx bx-user"></span>
-            {data.pegawai_name || data.username}
+            {data.PegawaiName || data.Username}
           </h2>
 
           <span
             className={`
               text-xs px-2 py-1 rounded-full mt-1 sm:mt-0 self-center sm:self-auto
               ${
-                data.is_aktif === "y"
+                data.IsAktif === "y"
                   ? "bg-green-100 text-green-700 dark:bg-green-700 dark:text-white"
                   : "bg-red-100 text-red-700 dark:bg-red-700 dark:text-white"
               }
             `}
           >
-            {data.is_aktif === "y" ? "Aktif" : "Nonaktif"}
+            {data.IsAktif === "y" ? "Aktif" : "Nonaktif"}
           </span>
         </div>
 
@@ -81,28 +85,40 @@ export default function UserInternalCard({
           text-gray-600 dark:text-gray-300 text-sm
         "
         >
-          <p className="flex items-center gap-1 justify-center sm:justify-start">
-            <span className="bx bx-id-card"></span>
-            {data.username}
-          </p>
+          {data.Username && (
+            <p className="flex items-center gap-1 justify-center sm:justify-start">
+              <span className="bx bx-id-card"></span>
+              {data.Username}
+            </p>
+          )}
 
-          <p className="flex items-center gap-1 justify-center sm:justify-start">
-            <span className="bx bx-envelope"></span>
-            {data.email}@uib.ac.id
-          </p>
+          {data.Email && (
+            <p className="flex items-center gap-1 justify-center sm:justify-start">
+              <span className="bx bx-envelope"></span>
+              {data.Email}
+            </p>
+          )}
+
+          {!data.Username && !data.Email && (
+            <p className="text-xs text-gray-400 italic">
+              No contact info available
+            </p>
+          )}
         </div>
 
         {/* Group */}
-        <div className="flex justify-center sm:justify-start">
-          <span
-            className="
-            bg-amber-100 text-amber-700 dark:bg-amber-700 dark:text-white
-            px-2 py-1 text-xs rounded-md mt-3
-          "
-          >
-            Group {data.group_name}
-          </span>
-        </div>
+        {data.GroupName && (
+          <div className="flex justify-center sm:justify-start">
+            <span
+              className="
+              bg-amber-100 text-amber-700 dark:bg-amber-700 dark:text-white
+              px-2 py-1 text-xs rounded-md mt-3
+            "
+            >
+              Group {data.GroupName}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

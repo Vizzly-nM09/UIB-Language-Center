@@ -8,18 +8,44 @@ import LoadingPermission from "@/components/layout/LoadingPermission";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useHelp } from "@/contexts/help-context";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const setToken = useAuthStore((state) => state.setToken);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+  const { setCurrentPage } = useHelp();
 
   useEffect(() => {
     if (session?.user?.accessToken) {
       setToken(session.user.accessToken);
     }
   }, [session, setToken]);
+
+  // Set current page for help system based on pathname
+  useEffect(() => {
+    // Extract page key from pathname
+    // e.g., /dashboard -> dashboard, /management-data/user -> management-user
+    const segments = pathname.split('/').filter(Boolean);
+    let pageKey = 'dashboard';
+    
+    if (segments.length > 0) {
+      if (segments[0] === 'dashboard') {
+        pageKey = 'dashboard';
+      } else if (segments[0] === 'score-test') {
+        pageKey = 'score-test';
+      } else if (segments[0] === 'upload-center') {
+        pageKey = 'upload-center';
+      } else if (segments.includes('management-data')) {
+        if (segments.includes('user')) pageKey = 'management-user';
+        else if (segments.includes('modul')) pageKey = 'management-modul';
+        else if (segments.includes('usergroup')) pageKey = 'management-usergroup';
+      }
+    }
+    
+    setCurrentPage(pageKey);
+  }, [pathname, setCurrentPage]);
 
   // FIX: Hanya loading jika NextAuth sedang mengecek session
   // Sidebar akan menangani loading menunya sendiri dengan skeleton

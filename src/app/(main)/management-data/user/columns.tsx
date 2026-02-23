@@ -1,7 +1,7 @@
 "use client";
 
 import UserInternalCard from "@/components/UserInternalCard";
-import { UserType } from "@/types/UserTypes";
+import { UserType } from "@/types/UserType";
 import { ColumnDef } from "@tanstack/react-table";
 import { User } from "next-auth";
 

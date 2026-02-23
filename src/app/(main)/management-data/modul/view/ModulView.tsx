@@ -165,7 +165,7 @@ export default function ModulView() {
             Dashboard
           </Link>
           <span>/</span>
-          <span className="text-[#6C5DD3]">Modul Setup</span>
+          <span className="text-[#6C5DD3]">Module Setup</span>
         </div>
       </div>
 
@@ -173,7 +173,7 @@ export default function ModulView() {
         <div className="lg:col-span-2 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.02)] p-8 border border-gray-100/50">
           <input
             type="text"
-            placeholder="Search modul..."
+            placeholder="Search module..."
             className="w-full px-6 py-4 bg-[#F8F9FC] border-none rounded-2xl mb-8 text-sm font-bold focus:ring-4 focus:ring-[#6C5DD3]/10 transition-all outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -191,12 +191,12 @@ export default function ModulView() {
 
         <div className="lg:col-span-1 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.02)] p-8 border border-gray-100/50 sticky top-8 h-fit">
           <h2 className="text-xl font-black mb-8 text-gray-900">
-            {isEditing ? "Update" : "Add"} Modul
+            {isEditing ? "Update" : "Add"} Module
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                Modul Name
+                Module Name
               </label>
               <input
                 type="text"
@@ -224,14 +224,33 @@ export default function ModulView() {
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
                 Boxicon Class
               </label>
-              <input
-                type="text"
-                required
-                value={modul.icon}
-                onChange={(e) => setModul({ ...modul, icon: e.target.value })}
-                className="w-full rounded-2xl border-2 border-gray-50 px-4 py-3.5 text-sm font-bold focus:border-[#6C5DD3] transition-all"
-                placeholder="bx bx-home"
-              />
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  required
+                  value={modul.icon}
+                  onChange={(e) => setModul({ ...modul, icon: e.target.value })}
+                  className="flex-1 rounded-2xl border-2 border-gray-50 px-4 py-3.5 text-sm font-bold focus:border-[#6C5DD3] transition-all"
+                  placeholder="bx bx-home"
+                />
+                {modul.icon && (
+                  <div className="flex items-center justify-center w-14 h-14 rounded-2xl border-2 border-gray-50 bg-gradient-to-br from-[#6C5DD3]/5 to-[#8E7EFF]/5">
+                    <i className={`${modul.icon} text-2xl text-[#6C5DD3]`}></i>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                💡 Visit{" "}
+                <a
+                  href="https://boxicons.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#6C5DD3] hover:underline"
+                >
+                  boxicons.com
+                </a>{" "}
+                untuk cari icon
+              </p>
             </div>
 
             <div className="space-y-2">

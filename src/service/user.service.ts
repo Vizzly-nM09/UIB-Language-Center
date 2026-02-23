@@ -11,7 +11,10 @@ export const getUserData = async (token: string) => {
       },
     });
 
+    console.log("getUserData response:", res.data);
+
     if (res.status === 200) {
+      console.log("getUserData final data:", res.data.data);
       return res.data.data;
     } else {
       showNotification({
@@ -23,6 +26,7 @@ export const getUserData = async (token: string) => {
       return [];
     }
   } catch (error) {
+    console.error("getUserData error:", error);
     showNotification({
       status: "text-red-500",
       icon: "bx bx-error text-2xl",

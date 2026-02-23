@@ -177,29 +177,46 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                   )}
                 >
                   <summary
-                    className={`flex items-center justify-between px-4 py-3.5 rounded-2xl cursor-pointer list-none transition-all ${isActive ? "text-white bg-white/10" : "text-white/60 hover:bg-white/5 hover:text-white"}`}
+                    className={`flex items-center justify-between px-4 py-3.5 rounded-2xl cursor-pointer list-none transition-all group-hover:shadow-md ${
+                      isActive
+                        ? "text-white bg-white/15 shadow-md"
+                        : "text-white/60 hover:text-white hover:bg-white/10"
+                    }`}
                   >
                     <div className="flex items-center gap-3">
-                      <i className={`${mdl.modul_icon} text-xl`}></i>
+                      <i className={`${mdl.modul_icon} text-xl transition-transform group-open:scale-110`}></i>
                       <span className="text-[13px] font-bold tracking-wide">
                         {mdl.modul_name}
                       </span>
                     </div>
                     <ChevronDown
-                      size={14}
-                      className="transition-transform duration-300 group-open:rotate-180 opacity-40"
+                      size={16}
+                      className="transition-all duration-300 group-open:rotate-180 opacity-50 group-hover:opacity-100"
                     />
                   </summary>
-                  <div className="pl-12 pr-2 py-2 space-y-2">
-                    {mdl.sub_menu?.map((sub: any) => (
-                      <Link
-                        key={sub.modul_id}
-                        href={sub.modul_link}
-                        className={`block text-[12px] font-bold transition-all ${pathname === sub.modul_link ? "text-white" : "text-white/40 hover:text-white"}`}
-                      >
-                        • {sub.modul_name}
-                      </Link>
-                    ))}
+                  <div className="pl-8 pr-2 py-2 space-y-1.5">
+                    {mdl.sub_menu?.map((sub: any) => {
+                      const isSubActive = pathname === sub.modul_link;
+                      return (
+                        <Link
+                          key={sub.modul_id}
+                          href={sub.modul_link}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-bold transition-all group ${
+                            isSubActive
+                              ? "text-white bg-white/20 shadow-md"
+                              : "text-white/50 hover:text-white hover:bg-white/10"
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full transition-all ${
+                            isSubActive ? "bg-white" : "bg-white/30 group-hover:bg-white/60"
+                          }`}></span>
+                          <span className="truncate">{sub.modul_name}</span>
+                          {sub.modul_icon && (
+                            <i className={`${sub.modul_icon} text-sm ml-auto opacity-60 group-hover:opacity-100 transition-opacity`}></i>
+                          )}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </details>
               ) : (

@@ -7,6 +7,8 @@ import { ThemeProvider } from "./ThemeContext";
 import Notifikasi from "@/components/Notifikasi";
 import QueryProvider from "./QueryProvider";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import { HelpProvider } from "@/contexts/help-context";
+import { HelpModal, GuidedTour, HelpSidebar } from "@/components/help-system";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -43,14 +45,21 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <ClientSessionProvider>
-            {/* QueryProvider membungkus children agar logic data-fetching berjalan global */}
-            <QueryProvider>
-              {children}
-            </QueryProvider>
-            
-            {/* Komponen UI Global yang muncul di atas semua halaman */}
-            <Notifikasi />
-            <ConfirmationBox />
+            <HelpProvider>
+              {/* QueryProvider membungkus children agar logic data-fetching berjalan global */}
+              <QueryProvider>
+                {children}
+              </QueryProvider>
+              
+              {/* Komponen UI Global yang muncul di atas semua halaman */}
+              <Notifikasi />
+              <ConfirmationBox />
+              
+              {/* Help System Components */}
+              <HelpModal />
+              <GuidedTour />
+              <HelpSidebar />
+            </HelpProvider>
           </ClientSessionProvider>
         </ThemeProvider>
       </body>

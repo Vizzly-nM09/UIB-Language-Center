@@ -159,31 +159,34 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-end space-x-2 py-4 gap-3 mr-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          className="dark:text-white dark:bg-[#212121]"
-        >
-          Sebelumnya
-        </Button>
-        <div className="font-medium text-slate-700 text-sm dark:text-white">
-          Halaman {table.getState().pagination.pageIndex + 1} dari{" "}
-          {table.getPageCount()}
+      <div className="flex items-center justify-between space-x-2 py-4 px-4">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="dark:text-white dark:bg-[#212121] gap-2"
+          >
+            <span className="bx bx-chevron-left"></span>
+            Sebelumnya
+          </Button>
+          <div className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-semibold text-sm text-gray-700 dark:text-gray-200">
+            Halaman <span className="text-[#6C5DD3] mx-1">{table.getState().pagination.pageIndex + 1}</span> dari <span className="text-[#6C5DD3] ml-1">{table.getPageCount()}</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="dark:text-white dark:bg-[#212121] gap-2"
+          >
+            Berikutnya
+            <span className="bx bx-chevron-right"></span>
+          </Button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          className="dark:text-white dark:bg-[#212121]"
-        >
-          Berikutnya
-        </Button>
         <select
-          className="select select-bordered bg-transparent select-sm"
+          className="select select-bordered bg-white dark:bg-[#212121] select-sm text-sm font-medium dark:text-white"
           value={table.getState().pagination.pageSize}
           onChange={(e) => {
             table.setPageSize(Number(e.target.value));
