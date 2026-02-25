@@ -44,7 +44,13 @@ export function DatePicker({
             selected={value ? new Date(value) : undefined}
             captionLayout="dropdown"
             onSelect={(date) => {
-              setValue(date!.toISOString());
+              if (date) {
+                // ✅ PERBAIKAN: Hitung offset zona waktu lokal agar tanggal tidak mundur ke belakang saat di-parse ke ISO
+                const offset = date.getTimezoneOffset();
+                const localDate = new Date(date.getTime() - offset * 60 * 1000);
+
+                setValue(localDate.toISOString());
+              }
               setOpen(false);
             }}
           />

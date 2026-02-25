@@ -2,9 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ModulAlternateType } from "@/types/ModulAlternateType";
+import { ModulType } from "@/types/ModulType";
 
-export const columns: ColumnDef<ModulAlternateType>[] = [
+export const columns: ColumnDef<ModulType>[] = [
   {
     id: "search",
     accessorFn: (row) =>

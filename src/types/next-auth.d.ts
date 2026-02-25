@@ -10,7 +10,7 @@ declare module "next-auth" {
     refreshToken: string; // Akan disimpan di session token (aman)
     groupId: string;
     groupName: string;
-    profilePicture: string;
+    avatar: string;
     userName: string;
   }
 
@@ -21,8 +21,8 @@ declare module "next-auth" {
       refreshToken: string;
       groupId: string;
       groupName: string;
-      profilePicture: string; // INI KUNCINYA
-      name: string;
+      avatar: string; // INI KUNCINYA
+      nama: string;
       userName: string;
     } & DefaultSession["user"];
   }
@@ -35,7 +35,7 @@ declare module "next-auth/jwt" {
     refreshToken: string;
     groupId: string;
     groupName: string;
-    profilePicture: string; // INI KUNCINYA
+    avatar: string; // INI KUNCINYA
     userName: string;
   }
 }

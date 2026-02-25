@@ -1,5 +1,5 @@
 import { ModulType } from "@/types/ModulType";
-import { UserType } from "@/types/UserTypes";
+import { UserType } from "@/types/UserType";
 import { Pencil, Trash2 } from "lucide-react";
 
 export default function ModulCard({

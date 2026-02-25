@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { modulId: string } }
+  // ✅ FIX 1: Tipe params WAJIB dibungkus dengan Promise
+  context: { params: Promise<{ modulId: string }> }
 ) {
   const auth = req.headers.get("authorization");
-  // const { modulId } = params;
-  const pathname = req.nextUrl.pathname;
-  const pathSegment = pathname.split("/");
-  const modulId = pathSegment[pathSegment.length - 1];
+
+  // ✅ FIX 2: Kita harus me-ngunggu (await) params-nya. 
+  // Sekarang Anda tidak perlu repot-repot membelah (split) URL lagi!
+  const { modulId } = await context.params;
 
   try {
     const res = await axios.delete(
@@ -33,6 +34,9 @@ export async function DELETE(
       );
     }
   } catch (error: any) {
-    return NextResponse.json({ data: error.response.data }, { status: 500 });
+    return NextResponse.json(
+      { data: error?.response?.data || "Terjadi kesalahan server" },
+      { status: 500 }
+    );
   }
 }

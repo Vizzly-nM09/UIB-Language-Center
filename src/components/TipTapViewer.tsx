@@ -38,16 +38,16 @@ import { TableHandle } from "@/components/tiptap-node/table-node/ui/table-handle
 import { TableSelectionOverlay } from "@/components/tiptap-node/table-node/ui/table-selection-overlay";
 import { TableCellHandleMenu } from "@/components/tiptap-node/table-node/ui/table-cell-handle-menu";
 import { TableExtendRowColumnButtons } from "@/components/tiptap-node/table-node/ui/table-extend-row-column-button";
-import "@/components/tiptap-node/table-node/styles/prosemirror-table.scss";
-import "@/components/tiptap-node/table-node/styles/table-node.scss";
+// import "@/components/tiptap-node/table-node/styles/prosemirror-table.scss";
+// import "@/components/tiptap-node/table-node/styles/table-node.scss";
 
-import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
-import "@/components/tiptap-node/code-block-node/code-block-node.scss";
-import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss";
-import "@/components/tiptap-node/list-node/list-node.scss";
-import "@/components/tiptap-node/image-node/image-node.scss";
-import "@/components/tiptap-node/heading-node/heading-node.scss";
-import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
+// import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
+// import "@/components/tiptap-node/code-block-node/code-block-node.scss";
+// import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss";
+// import "@/components/tiptap-node/list-node/list-node.scss";
+// import "@/components/tiptap-node/image-node/image-node.scss";
+// import "@/components/tiptap-node/heading-node/heading-node.scss";
+// import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
 
 // --- Tiptap UI ---
 import { EmojiDropdownMenu } from "@/components/tiptap-ui/emoji-dropdown-menu";
@@ -83,7 +83,7 @@ export default function TiptapViewer({ content }: { content: any }) {
       Mention,
       Emoji.configure({
         emojis: gitHubEmojis.filter(
-          (emoji) => !emoji.name.includes("regional")
+          (emoji) => !emoji.name.includes("regional"),
         ),
         forceFallbackImages: true,
       }),

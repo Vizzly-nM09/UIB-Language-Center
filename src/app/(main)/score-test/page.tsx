@@ -30,7 +30,6 @@ const FloatingInput = ({
             : undefined,
         ...rest,
       })}
-      // ✅ MEKANISME HARD-BLOCK (DIPERTAHANKAN)
       onInput={(e) => {
         let val = e.currentTarget.value;
         if (name === "npm") {
@@ -84,14 +83,14 @@ const CustomSelect = ({
   ...rest
 }: any) => (
   <div className="relative group">
-    <label className="block text-xs font-extrabold mb-2 ml-1 text-gray-400 uppercase tracking-widest">
+    <label className="block text-xs font-extrabold mb-2 ml-1 text-gray-400 uppercase tracking-widest transition-colors group-hover:text-[#6C5DD3]">
       {label}
     </label>
     <div className="relative">
       <select
         {...register(name, { required })}
         {...rest}
-        className="w-full px-4 py-3.5 border-2 rounded-2xl bg-white/50 border-gray-100 focus:border-[#6C5DD3] focus:ring-4 focus:ring-[#6C5DD3]/20 outline-none text-sm font-bold cursor-pointer appearance-none transition-all duration-300 shadow-sm focus:shadow-md focus:bg-white"
+        className="w-full px-4 py-3.5 border-2 rounded-2xl bg-white/50 border-gray-100 focus:border-[#6C5DD3] hover:border-[#6C5DD3] hover:bg-white focus:ring-4 focus:ring-[#6C5DD3]/20 outline-none text-sm font-bold cursor-pointer appearance-none transition-all duration-300 shadow-sm focus:shadow-md focus:bg-white"
       >
         {children}
       </select>
@@ -139,7 +138,6 @@ export default function ScoreTest() {
   const nSp = watch("nilaiSpeaking");
   const tanggalUjian = watch("tanggalUjian");
 
-  // ✅ ESTIMASI SKOR TOTAL UNTUK SEMUA TES
   const estimatedTotal = useMemo(() => {
     const l = parseInt(nL) || 0;
     const s = parseInt(nS) || 0;
@@ -156,40 +154,28 @@ export default function ScoreTest() {
     return 0;
   }, [nL, nS, nR, nW, nSp, jenisTes]);
 
-  // ✅ AMBIL DATA PRODI
   useEffect(() => {
     const fetchProdi = async () => {
       if (!session?.user?.accessToken) return;
       setIsLoadingProdi(true);
       try {
-        // Get fresh session to ensure token is not expired
         const sessionRes = await fetch("/api/auth/session");
         const freshSession = await sessionRes.json();
         const freshToken =
           freshSession?.user?.accessToken || session?.user?.accessToken;
-
-        console.log("Score-test: Using fresh token for prodi fetch");
 
         const res = await fetch(`/api/references/prodi-list`, {
           headers: { Authorization: `Bearer ${freshToken}` },
         });
         if (res.ok) {
           const data = await res.json();
-          console.log("Score-test prodi response:", data);
-
-          // Handle the proxy response structure: { data: {...} }
           const prodiData = data.data || data.prodiNama || {};
-          console.log("Prodi data extracted:", prodiData);
-
           const prodiArray = Object.values(prodiData).sort((a: any, b: any) =>
             (a.ProdiNama || a.prodi_nama || "").localeCompare(
               b.ProdiNama || b.prodi_nama || "",
             ),
           );
-          console.log("Prodi array:", prodiArray);
           setProdiList(prodiArray);
-        } else {
-          console.error("Failed to fetch prodi:", res.status, res.statusText);
         }
       } catch (error) {
         console.error("Error fetching prodi:", error);
@@ -204,7 +190,7 @@ export default function ScoreTest() {
     if (!session?.user?.accessToken) return;
     try {
       const res = await fetch(`${process.env.SERVICE_URL}/v2/english-score`, {
-        method: "PUT", // ✅ MENGGUNAKAN PUT
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
@@ -221,7 +207,7 @@ export default function ScoreTest() {
           nilai_reading: Number(data.nilaiReading || 0),
           nilai_writing: Number(data.nilaiWriting || 0),
           nilai_speaking: Number(data.nilaiSpeaking || 0),
-          skor_total: estimatedTotal, //\
+          skor_total: estimatedTotal,
         }),
       });
 
@@ -315,18 +301,23 @@ export default function ScoreTest() {
                 <option value="prediction">Prediction</option>
                 <option value="official">Official</option>
               </CustomSelect>
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-gray-500 uppercase ml-1">
+
+              {/* ✅ PERBAIKAN UI EXAM DATE DI SINI */}
+              <div className="relative group">
+                <label className="block text-xs font-extrabold mb-2 ml-1 text-gray-400 uppercase tracking-widest transition-colors group-hover:text-[#6C5DD3]">
                   Exam Date
                 </label>
-                <DatePicker
-                  placeholder="Pilih tanggal ujian"
-                  value={tanggalUjian || ""}
-                  setValue={(date) =>
-                    setValue("tanggalUjian", date.split("T")[0])
-                  }
-                  className="text-xs"
-                />
+                <div className="relative">
+                  <DatePicker
+                    placeholder="Pilih tanggal ujian"
+                    value={tanggalUjian || ""}
+                    setValue={(date) =>
+                      setValue("tanggalUjian", date.split("T")[0])
+                    }
+                    // Class name ini yang membuat border-nya tebal dan identik dengan input lainnya
+                    className="w-full px-4 h-[52px] border-2 rounded-2xl bg-white/50 border-gray-100 hover:border-[#6C5DD3] hover:bg-white focus:border-[#6C5DD3] focus:ring-4 focus:ring-[#6C5DD3]/20 outline-none text-sm font-bold cursor-pointer transition-all duration-300 shadow-sm data-[state=open]:border-[#6C5DD3] data-[state=open]:ring-4 data-[state=open]:ring-[#6C5DD3]/20 text-gray-700"
+                  />
+                </div>
               </div>
             </div>
           </div>

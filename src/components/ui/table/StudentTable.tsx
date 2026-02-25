@@ -162,7 +162,9 @@ export const StudentsTable = ({ data = [] }: { data: any[] }) => {
                 className="border-b border-gray-50 hover:bg-gray-50/30 transition-all group"
               >
                 <TableCell className="px-4 py-4 text-center">
-                  <Link href={`/dashboard/mahasiswa/${mhs.npm_mahasiswa}`}>
+                  <Link
+                    href={`/dashboard/mahasiswa/${mhs.npm_mahasiswa}?idTest=${mhs.IdTest}`}
+                  >
                     {/* ICON MATA UNGU: Latar ungu cerah, Ikon ungu, Hover ungu pekat */}
                     <div className="inline-flex items-center justify-center p-2 rounded-xl border border-purple-100 bg-purple-50 text-[#9969ff] hover:bg-[#9969ff] hover:text-white transition-all duration-300 active:scale-90 shadow-sm">
                       <Icons.Eye />

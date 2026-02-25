@@ -9,6 +9,7 @@ import {
   Download,
   CheckCircle,
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 
 interface Props {
@@ -22,14 +23,17 @@ interface Props {
 export default function UploadPageTemplate({
   title,
   description,
-  apiEndpoint,
   templateName,
   templateUrl,
+  apiEndpoint,
 }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Ambil session untuk mendapatkan token akses
+  const { data: session }: any = useSession();
 
   const handleDownload = () => {
     if (!templateUrl) return;
@@ -47,53 +51,59 @@ export default function UploadPageTemplate({
       toast.error("Pilih file terlebih dahulu!");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("file", file); // Key "file" ini harus sama dengan yang diekspektasi Backend
-
     setIsUploading(true);
-    setProgress(0);
+    // Animasi progress bar (maksimal 90% sampai backend merespon)
+    const interval = setInterval(
+      () => setProgress((p) => (p >= 90 ? 90 : p + 5)),
+      200,
+    );
 
     try {
-      // PROSES UPLOAD REAL MENGGUNAKAN AXIOS
+      // Siapkan file ke dalam FormData
+      const formData = new FormData();
+      formData.append("file", file);
+
+      formData.append("sheet_name", "Sheet1");
+
+      // Tembak endpoint internal Next.js (route.ts)
       const response = await axios.post(apiEndpoint, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-        },
-        // Tracking progress upload asli
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / (progressEvent.total || 100),
-          );
-          setProgress(percentCompleted);
+          // Sisipkan Token di sini agar tidak kena 401
+          Authorization: `Bearer ${session?.user?.accessToken}`,
         },
       });
 
-      if (response.status === 200 || response.status === 201) {
-        toast.success(`Data ${title} berhasil diupload!`);
+      clearInterval(interval);
+      setProgress(100);
 
-        // Reset state setelah jeda sebentar agar user bisa lihat progress 100%
-        setTimeout(() => {
-          setFile(null);
-          setIsUploading(false);
-          setProgress(0);
-          if (fileInputRef.current) fileInputRef.current.value = "";
-        }, 1500);
-      }
+      // Tampilkan pesan sukses dari respon backend
+      toast.success(
+        response.data.message || `Data ${title} berhasil diupload!`,
+      );
+
+      // Reset state form setelah sukses
+      setTimeout(() => {
+        setFile(null);
+        setIsUploading(false);
+        setProgress(0);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }, 1000);
     } catch (error: any) {
-      console.error("Upload error:", error);
+      clearInterval(interval);
       setIsUploading(false);
-      setProgress(0);
+      setProgress(0); // Reset progress karena gagal
 
-      // Ambil pesan error dari backend jika ada
-      const errorMessage =
-        error.response?.data?.message || "Gagal mengupload data.";
-      toast.error(errorMessage);
+      // Tangkap pesan error spesifik dari API internal atau backend
+      const errorMsg =
+        error.response?.data?.message ||
+        "Gagal mengupload data. Pastikan format file sesuai.";
+      toast.error(errorMsg);
+      console.error("Upload Error:", error.response?.data || error.message);
     }
   };
 
   const handleCancel = () => {
-    if (isUploading) return; // Mencegah cancel saat sedang proses kirim
     setFile(null);
     setProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -209,7 +219,7 @@ export default function UploadPageTemplate({
             </div>
           )}
 
-          {/* 4. TOMBOL AKSI */}
+          {/* 4. TOMBOL AKSI (BATAL & UPLOAD DATA) */}
           <div className="mt-10 flex flex-col-reverse md:flex-row justify-end gap-4 border-t border-gray-100 pt-8">
             <button
               type="button"
@@ -224,8 +234,8 @@ export default function UploadPageTemplate({
               onClick={handleUpload}
               disabled={!file || isUploading}
               className={`px-10 py-3.5 rounded-xl font-bold text-white shadow-lg transition-all flex items-center justify-center gap-2.5 
-                ${!file || isUploading ? "bg-gray-300 cursor-not-allowed shadow-none text-gray-500" : "bg-[#6C5DD3] hover:bg-[#5b4eb8] active:scale-95 shadow-purple-500/20"}
-              `}
+                                ${!file || isUploading ? "bg-gray-300 cursor-not-allowed shadow-none text-gray-500" : "bg-[#6C5DD3] hover:bg-[#5b4eb8] active:scale-95 shadow-purple-500/20"}
+                            `}
             >
               {isUploading ? "Memproses..." : "Upload Data"}
             </button>

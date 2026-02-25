@@ -184,7 +184,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <i className={`${mdl.modul_icon} text-xl transition-transform group-open:scale-110`}></i>
+                      <i
+                        className={`${mdl.modul_icon} text-xl transition-transform group-open:scale-110`}
+                      ></i>
                       <span className="text-[13px] font-bold tracking-wide">
                         {mdl.modul_name}
                       </span>
@@ -207,12 +209,18 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                               : "text-white/50 hover:text-white hover:bg-white/10"
                           }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full transition-all ${
-                            isSubActive ? "bg-white" : "bg-white/30 group-hover:bg-white/60"
-                          }`}></span>
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full transition-all ${
+                              isSubActive
+                                ? "bg-white"
+                                : "bg-white/30 group-hover:bg-white/60"
+                            }`}
+                          ></span>
                           <span className="truncate">{sub.modul_name}</span>
                           {sub.modul_icon && (
-                            <i className={`${sub.modul_icon} text-sm ml-auto opacity-60 group-hover:opacity-100 transition-opacity`}></i>
+                            <i
+                              className={`${sub.modul_icon} text-sm ml-auto opacity-60 group-hover:opacity-100 transition-opacity`}
+                            ></i>
                           )}
                         </Link>
                       );

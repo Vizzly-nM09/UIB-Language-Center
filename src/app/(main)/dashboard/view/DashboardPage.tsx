@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useDashboardStats } from "@/hooks/prodi/useDashboardStat";
 import { useProdiData } from "@/hooks/prodi/useProdiData";
@@ -36,9 +36,6 @@ const MONTHS = [
   "Dec",
 ];
 
-/**
- * POIN 3: Aturan Skor Lulus Global
- */
 export const checkPassStatus = (jenis: string, tipe: string, score: number) => {
   const j = jenis?.toUpperCase() || "";
   const t = tipe?.toLowerCase() || "";
@@ -47,7 +44,6 @@ export const checkPassStatus = (jenis: string, tipe: string, score: number) => {
     if (t.includes("prediction")) return score >= 700;
     if (t.includes("official")) return score >= 605;
   }
-  // TOEFL (ITP/iBT/Default) minimal 500
   return score >= 500;
 };
 
@@ -55,7 +51,6 @@ export default function DashboardView() {
   const { data: session, status } = useSession();
   const currentYear = new Date().getFullYear();
 
-  // POIN 2: Rentang Tahun sampai 2010
   const angkatanOptions = useMemo(() => {
     const years = [];
     for (let i = currentYear; i >= 2010; i--) years.push(i.toString());
@@ -64,9 +59,38 @@ export default function DashboardView() {
 
   const [filterInputs, setFilterInputs] = useState({ prodi: "", tahun: "" });
   const [activeFilters, setActiveFilters] = useState({ prodi: "", tahun: "" });
-
-  // State navigasi untuk 4 chart kelulusan
   const [chartIndex, setChartIndex] = useState(0);
+
+  // =========================================================================
+  // 🔥 LOGIKA MEMORI: SIMPAN & PULIHKAN FILTER (SESSION STORAGE) 🔥
+  // =========================================================================
+
+  // 1. Saat Dashboard dimuat, cek apakah ada filter yang tersimpan sebelumnya
+  useEffect(() => {
+    const savedState = sessionStorage.getItem("dashboardState");
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      if (parsed.activeFilters) {
+        setFilterInputs(parsed.activeFilters); // Kembalikan teks di kotak filter
+        setActiveFilters(parsed.activeFilters); // Kembalikan filter yang aktif
+      }
+      if (parsed.chartIndex !== undefined) {
+        setChartIndex(parsed.chartIndex); // Kembalikan posisi chart Pie
+      }
+    }
+  }, []);
+
+  // 2. Setiap kali Anda melakukan filter, otomatis simpan ke memori browser
+  useEffect(() => {
+    // Jangan simpan kalau datanya masih kosong melompong (baru pertama buka)
+    if (activeFilters.tahun !== "" || activeFilters.prodi !== "") {
+      sessionStorage.setItem(
+        "dashboardState",
+        JSON.stringify({ activeFilters, chartIndex }),
+      );
+    }
+  }, [activeFilters, chartIndex]);
+  // =========================================================================
 
   const { data: prodiList } = useProdiData(session?.user?.accessToken, status);
   const { data: apiResponse, isLoading: isLoadingStats } = useDashboardStats(
@@ -78,10 +102,6 @@ export default function DashboardView() {
   const studentData = apiResponse?.hasilUjian || [];
   const isDataReady = activeFilters.tahun !== "";
 
-  /**
-   * PERBAIKAN: LOGIKA RATA-RATA SKOR BULANAN (FULL CODE)
-   * Menghitung nilai rata-rata kumulatif agar data tidak tertimpa
-   */
   const trendData = useMemo(() => {
     const monthlyStats = {
       TOEIC: Array.from({ length: 12 }, () => ({ total: 0, count: 0 })),
@@ -127,9 +147,6 @@ export default function DashboardView() {
     };
   }, [studentData]);
 
-  /**
-   * LOGIKA 4 KATEGORI KELULUSAN (Swipeable)
-   */
   const passFailCategories = [
     { title: "TOEIC Prediction", jenis: "TOEIC", tipe: "Prediction" },
     { title: "TOEIC Official", jenis: "TOEIC", tipe: "Official" },
@@ -137,9 +154,6 @@ export default function DashboardView() {
     { title: "TOEFL Official", jenis: "TOEFL", tipe: "Official" },
   ];
 
-  /**
-   * PERBAIKAN: LOGIKA PERSENTASE REMEDIAL (0% JIKA DATA KOSONG)
-   */
   const currentCategoryStats = useMemo(() => {
     const cat = passFailCategories[chartIndex];
     const group = studentData.filter(
@@ -153,7 +167,6 @@ export default function DashboardView() {
       checkPassStatus(s.jenis_test, s.tipe_test, s.TotalScore),
     ).length;
 
-    // Jika total mahasiswa adalah 0, maka persentase lulus dan remedial keduanya 0%
     const passRate = total > 0 ? Math.round((passCount / total) * 100) : 0;
     const failRate = total > 0 ? 100 - passRate : 0;
 
@@ -167,7 +180,6 @@ export default function DashboardView() {
     };
   }, [studentData, chartIndex]);
 
-  // Statistik Kumulatif untuk Card Utama
   const mainStats = useMemo(() => {
     const calcAvg = (key: string) => {
       const group = studentData.filter((s: any) =>
@@ -204,7 +216,7 @@ export default function DashboardView() {
                   setFilterInputs({ ...filterInputs, prodi: e.target.value })
                 }
               >
-                <option value="">Select The Study Program</option>
+                <option value="">Study Program</option>
                 {prodiList &&
                   Object.entries(prodiList).map(([id, info]: [string, any]) => (
                     <option key={id} value={id}>
@@ -248,6 +260,7 @@ export default function DashboardView() {
       </div>
 
       {!isDataReady ? (
+        // TAMPILAN KOSONG NORMAL
         <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[2rem] border border-dashed border-gray-200 text-gray-400 font-bold text-sm">
           <Filter className="mb-4 text-gray-200 animate-bounce" size={48} />
           Please enter the major and year to see the grade data.
@@ -274,8 +287,6 @@ export default function DashboardView() {
               icon={Icons.Test}
               color="bg-orange-500"
             />
-
-            {/* Card Lulus & Remedial mengikuti kategori Swipe Chart */}
             <StatCard
               title={`Passed  (${passFailCategories[chartIndex].title})`}
               value={currentCategoryStats.passRate}
@@ -293,7 +304,7 @@ export default function DashboardView() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* TREN CHART (AVERAGE) */}
+            {/* TREN CHART */}
             <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
               <div className="flex items-center gap-2 mb-8 text-[#9969ff] font-bold text-lg uppercase tracking-tight">
                 <TrendingUp size={20} /> Monthly Score Trend (Average)
@@ -303,7 +314,7 @@ export default function DashboardView() {
               </div>
             </div>
 
-            {/* RATIO KELULUSAN DENGAN SWIPE */}
+            {/* RATIO KELULUSAN */}
             <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col items-center">
               <div className="flex justify-between items-center w-full mb-8">
                 <div className="flex items-center gap-2 text-gray-800 font-bold text-[10px] uppercase tracking-tight">
@@ -362,7 +373,7 @@ export default function DashboardView() {
                     </div>
                   </>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-gray-300 text-[10px] font-bold italic uppercase">
+                  <div className="h-full flex items-center justify-center text-gray-300 text-[10px] font-bold italic uppercase text-center">
                     Still No Data Available for This Category
                   </div>
                 )}

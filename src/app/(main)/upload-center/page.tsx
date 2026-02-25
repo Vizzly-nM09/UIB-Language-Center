@@ -23,7 +23,7 @@ export default function UploadCenterPage() {
         return (
           <UploadTemplate
             title="Upload Score Pegawai"
-            description="Gunakan template yang disediakan untuk mengunggah nilai bahasa Inggris pegawai."
+            description="Use the template provided to upload employee English scores.."
             apiEndpoint={`${sharedTemplate.baseEndpoint}?type=pegawai`}
             templateName={sharedTemplate.templateName}
             templateUrl={sharedTemplate.templateUrl}
@@ -34,7 +34,7 @@ export default function UploadCenterPage() {
         return (
           <UploadTemplate
             title="Upload Score Mandarin"
-            description="Impor data nilai Mandarin (HSK Level 1-6) menggunakan template Excel."
+            description="Import Mandarin grade from HSK Level 1-6 using the Excel template."
             apiEndpoint={`${sharedTemplate.baseEndpoint}?type=mandarin`}
             templateName={sharedTemplate.templateName}
             templateUrl={sharedTemplate.templateUrl}
@@ -46,7 +46,7 @@ export default function UploadCenterPage() {
         return (
           <UploadTemplate
             title="Upload Student Test Scores"
-            description="Silakan download template dan isi kolom nilai mahasiswa dengan benar."
+            description="Please download the template and fill in the student grades column correctly."
             apiEndpoint={`${sharedTemplate.baseEndpoint}?type=test`}
             templateName={sharedTemplate.templateName}
             templateUrl={sharedTemplate.templateUrl}

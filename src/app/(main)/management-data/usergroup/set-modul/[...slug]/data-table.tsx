@@ -26,12 +26,12 @@ import {
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import UserInternalCardSkeleton from "@/components/UserInternalCardSkeleton";
-import { UserType } from "@/types/UserTypes";
+import { UserType } from "@/types/UserType";
 
 const globalFilterFn: FilterFn<any> = (
   row: Row<any>,
   columnId: string, // walaupun tidak dipakai, tetap harus ditulis
-  filterValue: string
+  filterValue: string,
 ) => {
   const value = row.getValue("search") as string;
 
@@ -144,7 +144,7 @@ export function DataTable<TData, TValue>({
                     ? null
                     : flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                 </TableHead>
               ))}
@@ -172,7 +172,7 @@ export function DataTable<TData, TValue>({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
@@ -216,7 +216,12 @@ export function DataTable<TData, TValue>({
             Sebelumnya
           </Button>
           <div className="inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 font-semibold text-sm text-gray-700 dark:text-gray-200">
-            Halaman <span className="text-[#6C5DD3] mx-1">{table.getState().pagination.pageIndex + 1}</span> dari <span className="text-[#6C5DD3] ml-1">{table.getPageCount()}</span>
+            Halaman{" "}
+            <span className="text-[#6C5DD3] mx-1">
+              {table.getState().pagination.pageIndex + 1}
+            </span>{" "}
+            dari{" "}
+            <span className="text-[#6C5DD3] ml-1">{table.getPageCount()}</span>
           </div>
           <Button
             variant="outline"

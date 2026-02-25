@@ -50,12 +50,15 @@ ChartJS.register(
 
 export default function StudentDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ npm: string }>;
+  searchParams: Promise<{ idTest?: string }>;
 }) {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { npm } = use(params);
+  const { idTest } = use(searchParams);
 
   // Parsing NPM untuk parameter API (Angkatan & Prodi)
   const filters = useMemo(
@@ -91,7 +94,16 @@ export default function StudentDetailPage({
       </div>
     );
 
-  const latest = history[0];
+  const latest = useMemo(() => {
+    if (idTest) {
+      const selectedTest = history.find(
+        (h: any) => String(h.IdTest) === String(idTest),
+      );
+      if (selectedTest) return selectedTest;
+    }
+    // Fallback: Jika tidak ada idTest di URL, baru tampilkan yang index ke-0
+    return history[0];
+  }, [history, idTest]);
   const isPassed = checkPassStatus(
     latest.jenis_test,
     latest.tipe_test,
